@@ -6,7 +6,7 @@ include(cmake/PreventInSourceBuilds.cmake)
 
 # Link this 'library' to set the c++ standard / compile-time options requested
 add_library(project_options INTERFACE)
-target_compile_features(project_options INTERFACE cxx_std_17)
+target_compile_features(project_options INTERFACE cxx_std_20)
 
 if(CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")
   option(ENABLE_BUILD_WITH_TIME_TRACE "Enable -ftime-trace to generate time tracing .json files on clang" OFF)
@@ -17,9 +17,6 @@ endif()
 
 # Link this 'library' to use the warnings specified in CompilerWarnings.cmake
 add_library(project_warnings INTERFACE)
-
-# enable cache system
-include(cmake/Cache.cmake)
 
 # standard compiler warnings
 include(cmake/CompilerWarnings.cmake)
@@ -59,9 +56,9 @@ endif()
 set(CONAN_EXTRA_REQUIRES "")
 set(CONAN_EXTRA_OPTIONS "")
 
-#set(CONAN_EXTRA_REQUIRES ${CONAN_EXTRA_REQUIRES} 
-#                          boost/1.73.0
-#)
+set(CONAN_EXTRA_REQUIRES ${CONAN_EXTRA_REQUIRES} 
+                         boost/1.73.0
+)
 
 include(cmake/Conan.cmake)
 run_conan()
