@@ -56,9 +56,9 @@ endif()
 set(CONAN_EXTRA_REQUIRES "")
 set(CONAN_EXTRA_OPTIONS "")
 
-set(CONAN_EXTRA_REQUIRES ${CONAN_EXTRA_REQUIRES} 
-                         boost/1.73.0
-)
+# set(CONAN_EXTRA_REQUIRES ${CONAN_EXTRA_REQUIRES} 
+#                          some_conan_lib
+# )
 
 include(cmake/Conan.cmake)
 run_conan()

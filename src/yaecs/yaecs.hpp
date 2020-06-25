@@ -7,18 +7,18 @@
 #include <bitset>
 #include <type_traits>
 
-#include <boost/mp11.hpp>
+#include <yaecs/mpl/mpl.hpp>
 
 namespace yaecs{
 
 template<typename... Ts>
-using signature =  boost::mp11::mp_list<Ts...>; // boost::hana::tuple_t<Ts...>;
+using signature =  yaecs::mpl::type_list<Ts...>;
 
 template<typename... Ts>
-using signature_list = boost::mp11::mp_list<Ts...>;
+using signature_list = yaecs::mpl::type_list<Ts...>;
 
 template<typename... Ts>
-using component_list = boost::mp11::mp_list<Ts...>;
+using component_list = yaecs::mpl::type_list<Ts...>;
 
 /**
  * @brief Entity component traits
@@ -32,33 +32,22 @@ struct ec_traits
     using component_list                        = CL;
     using signature_list                        = SL;
 
-    using component_signature_storage_t         = std::bitset< boost::mp11::mp_size<component_list>::value >;
+    using component_signature_storage_t         = std::bitset< yaecs::mpl::size_v<component_list> >;
 
     template<typename T>
     static constexpr bool is_component(){
-        if constexpr(std::is_same_v< boost::mp11::mp_contains<component_list, T> , boost::mp11::mp_true>){
-            return true;
-        }
-        else{
-            return false;
-        }
-        
+        return yaecs::mpl::contains_v<T, component_list>;
     }
 
     template<typename T>
     static constexpr bool is_signature(){
-        if constexpr(std::is_same_v< boost::mp11::mp_contains<signature_list, T> , boost::mp11::mp_true>){
-            return true;
-        }
-        else{
-            return false;
-        }
+        return yaecs::mpl::contains_v<T, signature_list>;
     }
 
     template<typename T>
     static constexpr int component_index(){
-        if constexpr(std::is_same_v<boost::mp11::mp_contains<component_list, T>, boost::mp11::mp_true>){
-            return boost::mp11::mp_find<component_list, T>::value;
+        if constexpr(yaecs::mpl::contains_v<T, component_list>){
+            return yaecs::mpl::index_v<T, component_list>;
         }
         else{
             return -1;
@@ -67,8 +56,8 @@ struct ec_traits
 
     template<typename T>
     static constexpr int signature_index(){
-        if constexpr(std::is_same_v<boost::mp11::mp_contains<signature_list, T>, boost::mp11::mp_true>){
-            return boost::mp11::mp_find<signature_list, T>::value;
+        if constexpr(yaecs::mpl::contains_v<T, signature_list>){
+            return yaecs::mpl::index_v<T, signature_list>;
         }
         else{
             return -1;
@@ -79,8 +68,8 @@ struct ec_traits
         return signature_count_;
     }
 
-    constexpr static int component_count_{boost::mp11::mp_size<component_list>::value};
-    constexpr static int signature_count_{boost::mp11::mp_size<signature_list>::value};
+    constexpr static int component_count_{yaecs::mpl::size_v<component_list>};
+    constexpr static int signature_count_{yaecs::mpl::size_v<signature_list>};
 };
 
 

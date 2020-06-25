@@ -1,6 +1,8 @@
 #include <catch2/catch.hpp>
 
 #include <yaecs/yaecs.hpp>
+#include <yaecs/mpl/mpl.hpp>
+
 
 #include <type_traits>
 #include <vector>
@@ -85,4 +87,29 @@ TEST_CASE("Signature storage tests", "[signature_storage]")
   auto sb_ = ss_.get_signature_bitset<S1>();
 
   sb_.set();
+}
+
+
+TEST_CASE("mpl tests", "[mpl]")
+{
+  struct T1{};
+  struct T2{};
+  struct T3{};
+
+  struct nothing_at_all{};
+
+  using tl = yaecs::mpl::type_list<T1, T2, T3>;
+
+  REQUIRE(yaecs::mpl::size_v<tl> == 3);
+
+  REQUIRE(yaecs::mpl::index_v<T1, tl> == 0);
+  REQUIRE(yaecs::mpl::index_v<T2, tl> == 1);
+  REQUIRE(yaecs::mpl::index_v<T3, tl> == 2);
+
+  REQUIRE(yaecs::mpl::contains_v<T1, tl> == true);
+  REQUIRE(yaecs::mpl::contains_v<T2, tl> == true);
+  REQUIRE(yaecs::mpl::contains_v<T3, tl> == true);
+
+  REQUIRE(yaecs::mpl::contains_v<nothing_at_all, tl> == false);
+
 }
