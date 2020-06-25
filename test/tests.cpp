@@ -84,4 +84,5 @@ TEST_CASE("Signature storage tests", "[signature_storage]")
 
   auto sb_ = ss_.get_signature_bitset<S1>();
 
+  sb_.set();
 }

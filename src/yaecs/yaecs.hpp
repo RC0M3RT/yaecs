@@ -29,8 +29,8 @@ using component_list = boost::mp11::mp_list<Ts...>;
 template<typename CL, typename SL>
 struct ec_traits
 {
-    using component_list                        = typename CL::mp_list;
-    using signature_list                        = typename SL::mp_list;
+    using component_list                        = CL;
+    using signature_list                        = SL;
 
     using component_signature_storage_t         = std::bitset< boost::mp11::mp_size<component_list>::value >;
 
@@ -113,7 +113,7 @@ class signature_storage{
 public:
 
     signature_storage(){
-        for(int i=0; i< signature_count_; i++){
+        for(std::size_t i=0; i< signature_count_; i++){
             signature_storage_[i] = component_signature_storage_t{};
         }
 
@@ -126,7 +126,7 @@ public:
     }
 
 private:
-    static constexpr int signature_count_{ECT::template signature_count()};
+    static constexpr int signature_count_{ECT::signature_count()};
     std::array<component_signature_storage_t, signature_count_> signature_storage_;
 };
 
