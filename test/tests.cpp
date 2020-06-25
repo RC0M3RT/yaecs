@@ -1,4 +1,4 @@
-#include <catch2/catch.hpp>
+#include <catch2/catch_all.hpp>
 
 #include <yaecs/yaecs.hpp>
 #include <yaecs/mpl/mpl.hpp>
@@ -89,6 +89,54 @@ TEST_CASE("Signature storage tests", "[signature_storage]")
   sb_.set();
 }
 
+TEST_CASE("Component storage tests", "[component_storage]")
+{
+  // Components
+  struct C1{
+    int i1;
+    std::string s1;
+  };
+  struct C2{
+    float f2;
+    std::string s2;
+  };
+  struct C3{
+    std::string s3_1;
+    std::string s3_2;
+  };
+
+  // Signatures
+  struct S1{};
+  struct S2{};
+
+  struct nothing_at_all{};
+
+  using components = yaecs::component_list<C1, C2, C3>;
+  using signatures = yaecs::signature_list<S1, S2>;
+
+  using ec_traits_t = yaecs::ec_traits<components, signatures>;
+
+  using component_storage_t = yaecs::component_storage<ec_traits_t>;
+
+  component_storage_t cs_{};
+
+  C1 c1_{211, "asdasd"};
+
+  cs_.add_component<C1>(c1_);
+  auto c1p_ = cs_.get_component<C1>(0);
+
+  REQUIRE(c1p_.i1 == 211);
+  REQUIRE(c1p_.s1 == "asdasd");
+
+  C2 c2_{3.10f, "qqwewe"};
+
+  cs_.add_component<C2>(c2_);
+  auto c2p_ = cs_.get_component<C2>(0);
+
+  REQUIRE(c2p_.f2 == 3.10f);
+  REQUIRE(c2p_.s2 == "qqwewe");
+
+}
 
 TEST_CASE("mpl tests", "[mpl]")
 {

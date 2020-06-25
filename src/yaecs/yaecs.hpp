@@ -7,7 +7,7 @@
 #include <bitset>
 #include <type_traits>
 
-#include <yaecs/mpl/mpl.hpp>
+#include "mpl/mpl.hpp"
 
 namespace yaecs{
 
@@ -103,9 +103,8 @@ public:
 
     signature_storage(){
         for(std::size_t i=0; i< signature_count_; i++){
-            signature_storage_[i] = component_signature_storage_t{};
+            signature_storage_[i] = component_signature_storage_t{false};
         }
-
     }
 
     template<typename T>
@@ -122,23 +121,41 @@ private:
 /**
  * @brief 
  * 
- * @tparam ST settings type
+ * @tparam ECT entity component traits
  */
-template<typename ST>
+template<typename ECT>
 class component_storage{
-    using component_list = typename ST::component_list;
+    using component_list = typename ECT::component_list;
+
+    template<typename... Args>
+    static std::tuple<std::vector<Args>...> to_tuple(yaecs::mpl::type_list<Args...>);
+
+    template <typename seq>
+    struct type_list_to_tuple {
+        using type = decltype(to_tuple(std::declval<seq>()));
+    };
+
+    template <typename seq>
+    using type_list_to_tuple_t = typename type_list_to_tuple<seq>::type;
+
     template<typename... Ts>
-    using storage_t = std::tuple<std::vector<Ts>...>;
+    using storage_t = type_list_to_tuple_t<component_list>;
 
 public:
 
     template<typename T>
-    auto& get(std::uint32_t data_index) noexcept{
+    void add_component(T& c){
+        std::vector<T>& component_vector_ = std::get<std::vector<T>>(components_);
+        component_vector_.push_back(c);
+    }
+
+    template<typename T>
+    T& get_component(std::uint32_t data_index) noexcept{
         return std::get<std::vector<T>>(components_)[data_index];
     }
 
 private:
-    storage_t<component_list> components_; 
+    storage_t<component_list> components_{}; 
 };
 
 

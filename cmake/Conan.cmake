@@ -16,7 +16,7 @@ macro(run_conan)
   conan_cmake_run(
     REQUIRES
     ${CONAN_EXTRA_REQUIRES}
-    catch2/2.11.0
+    catch2/3.0.0@catchorg/stable
     OPTIONS
     ${CONAN_EXTRA_OPTIONS}
     BASIC_SETUP
