@@ -6,6 +6,7 @@
 #include <vector>
 #include <bitset>
 #include <type_traits>
+#include <cassert>
 
 #include "mpl/mpl.hpp"
 
@@ -68,6 +69,10 @@ struct ec_traits
         return signature_count_;
     }
 
+    static constexpr int component_count(){
+        return component_count_;
+    }
+
     constexpr static int component_count_{yaecs::mpl::size_v<component_list>};
     constexpr static int signature_count_{yaecs::mpl::size_v<signature_list>};
 };
@@ -81,12 +86,39 @@ struct ec_traits
  * @tparam ECT entity component traits
  */
 template<typename ECT>
-struct entity{
-    
+class entity{
     using component_signature_storage = typename ECT::component_signature_storage_t;
+public:
 
-    std::uint32_t id;
-    component_signature_storage signatures;
+    entity(std::uint32_t id)
+        : id_{id}
+        , signatures_{false}
+    {
+    }
+
+    std::uint32_t id() const noexcept{ return id_; }
+
+    template<typename T>
+    void set_signature(bool enabled){
+        constexpr auto component_index = ECT::template component_index<T>();
+        signatures_[component_index] = enabled;
+    }
+
+    template<typename T>
+    bool get_signature(){
+        constexpr auto component_index = ECT::template component_index<T>();
+
+        if constexpr(component_index == -1){
+            return false;
+        }
+        else{
+            return signatures_[component_index];
+        }
+    }
+
+private:
+    std::uint32_t id_;
+    component_signature_storage signatures_{false};
 };
 
 /**
@@ -158,7 +190,54 @@ private:
     storage_t<component_list> components_{}; 
 };
 
+/**
+ * @brief Entity component engine
+ * 
+ * @tparam ECT entity component traits
+ */
+template<typename ECT>
+class ec_engine{
+    using ec_traits_type = ECT;
 
+    using component_signature_storage_t = typename ec_traits_type::component_signature_storage_t;
+
+    using entity_t = entity<ec_traits_type>;
+    using component_storage_t = component_storage<ec_traits_type>;
+    using signature_storage_t = signature_storage<ec_traits_type>;
+
+public:
+
+    std::uint32_t create_entity() noexcept{
+        std::uint32_t e_id_{0};
+
+        entities_.push_back(std::move(entity_t{entity_count_}));
+
+        e_id_ = entity_count_;
+
+        ++entity_count_;
+
+        return e_id_;
+    }
+
+    const entity_t& get_entity(std::size_t index) noexcept{
+        return entities_[index];
+    }
+
+    std::uint32_t entity_count() const noexcept{
+        return entity_count_;
+    }
+
+private:
+
+
+private:
+
+    std::vector<entity_t> entities_{};
+    component_storage_t components_{};
+    signature_storage_t signatures_{};
+
+    std::uint32_t entity_count_{0};
+};
 
 
 } // namespace yaecs

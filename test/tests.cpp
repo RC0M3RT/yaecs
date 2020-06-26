@@ -9,6 +9,39 @@
 #include <string>
 
 
+TEST_CASE("Entity tests", "[entity]")
+{
+  // Components
+  struct C1{}; // 0
+  struct C2{}; // 1
+  struct C3{}; // 2
+
+  // Signatures
+  struct S1{}; // 0
+  struct S2{}; // 1
+
+  struct nothing_at_all{};
+
+  using components = yaecs::component_list<C1, C2, C3>;
+  using signatures = yaecs::signature_list<S1, S2>;
+
+  using ec_traits_t = yaecs::ec_traits<components, signatures>;
+
+  using entity_t = yaecs::entity<ec_traits_t>;
+
+  entity_t e1{10};
+
+  e1.set_signature<C1>(true);
+  e1.set_signature<C2>(false);
+  e1.set_signature<C3>(true);
+
+  REQUIRE(e1.get_signature<C1>() == true);
+  REQUIRE(e1.get_signature<C2>() == false);
+  REQUIRE(e1.get_signature<C3>() == true);
+  REQUIRE(e1.get_signature<nothing_at_all>() == false);
+
+}
+
 TEST_CASE("Entity component traits tests", "[ec_trait]")
 {
   // Components
@@ -159,5 +192,47 @@ TEST_CASE("mpl tests", "[mpl]")
   REQUIRE(yaecs::mpl::contains_v<T3, tl> == true);
 
   REQUIRE(yaecs::mpl::contains_v<nothing_at_all, tl> == false);
+
+}
+
+
+TEST_CASE("ec_engine entity tests", "[ec_engine.entity]")
+{
+  // Components
+  struct C1{};
+  struct C2{};
+  struct C3{};
+
+  // Signatures
+  struct S1{};
+  struct S2{};
+
+  struct nothing_at_all{};
+
+  using components = yaecs::component_list<C1, C2, C3>;
+  using signatures = yaecs::signature_list<S1, S2>;
+
+  using ec_traits_t = yaecs::ec_traits<components, signatures>;
+
+  using ec_engine_type_t = yaecs::ec_engine<ec_traits_t>;
+
+  ec_engine_type_t engine_{};
+
+  auto e1_id = engine_.create_entity();
+
+  REQUIRE(e1_id == engine_.get_entity(0).id());
+
+  REQUIRE(engine_.entity_count() == 1);
+
+  engine_.create_entity();
+  engine_.create_entity();
+  engine_.create_entity();
+  engine_.create_entity();
+  engine_.create_entity();
+  engine_.create_entity();
+  engine_.create_entity();
+  engine_.create_entity();
+  
+  REQUIRE(engine_.entity_count() == 9);
 
 }
