@@ -104,7 +104,10 @@
 			"bit": "cpp",
 			"cwctype": "cpp",
 			"string_view": "cpp"
-		}
+		},
+		"cmake.ctestArgs": [
+			"--verbose"
+		]
 	}
 	
 }

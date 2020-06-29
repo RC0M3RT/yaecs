@@ -64,8 +64,9 @@ include(cmake/Conan.cmake)
 run_conan()
 
 if(ENABLE_TESTING)
+  include(CTest)
   enable_testing()
-  message("Building Tests. Be sure to check out test/constexpr_tests for constexpr testing")
+  message("Testing is enabled, tests will build")
   add_subdirectory(test)
 endif()
 

@@ -12,6 +12,8 @@ target_link_libraries(catch_main PRIVATE project_options)
 add_executable(tests tests.cpp)
 target_link_libraries(tests PRIVATE project_warnings project_options catch_main yaecs)
 
+add_test(NAME tests COMMAND tests)
+
 # automatically discover tests that are defined in catch based test files you can modify the unittests. TEST_PREFIX to
 # whatever you want, or use different for different binaries
 catch_discover_tests(
@@ -22,3 +24,19 @@ catch_discover_tests(
   -s
   --reporter=xml
   --out=tests.xml)
+
+add_executable(benchmarks benchmarks.cpp)
+target_link_libraries(benchmarks PRIVATE project_warnings project_options catch_main yaecs)
+
+add_test(NAME benchmarks COMMAND benchmarks)
+
+# automatically discover tests that are defined in catch based test files you can modify the unittests. TEST_PREFIX to
+# whatever you want, or use different for different binaries
+catch_discover_tests(
+  benchmarks
+  TEST_PREFIX
+  "benchmarks."
+  EXTRA_ARGS
+  -s
+  --reporter=xml
+  --out=benchmarks.xml)
