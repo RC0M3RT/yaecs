@@ -8,6 +8,8 @@ This project is initially generated from [cpp_starter_project](https://github.co
 
 Work in progress...
 
+* Current code is only tested on Windows VS 2019 16.6.2
+
 ## More on ECS
 
 * [Entity Component Systems FAQ](https://github.com/SanderMertens/ecs-faq)
