@@ -7,6 +7,8 @@
 
 #include "../mpl/mpl.hpp"
 
+#include <cassert>
+
 namespace yaecs{
 
 /**
@@ -125,18 +127,21 @@ public:
                 c( components_.get_component<Ts>(entity_.get_data_index<Ts>())... );
             }
         }
-    }
+    } 
 
     template<typename... Ts>
     static component_signature_storage_t build_signature(){
-        component_signature_storage_t sig_{0};
-        sig_.set(ECT::template component_index<Ts>()...);
-
+        component_signature_storage_t sig_{false};
+        (set_signature<Ts>(sig_) , ... );
         return sig_;
     }
 
 private:
 
+    template<typename T>
+    static void set_signature(component_signature_storage_t& sig) {
+        sig.set(ECT::template component_index<T>());
+    }
 
 
 private:

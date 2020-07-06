@@ -2,6 +2,8 @@
 
 #include "../mpl/mpl.hpp"
 
+#include <vector>
+
 namespace yaecs{
 
 /**
@@ -39,7 +41,7 @@ public:
         auto vec_size_ = component_vector_.size();
         component_vector_.push_back(c);
 
-        return vec_size_;
+        return static_cast<std::uint32_t>(vec_size_);
     }
 
     template<typename T>
