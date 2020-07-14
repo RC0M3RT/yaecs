@@ -3,7 +3,6 @@
 #include "ec_traits.hpp"
 #include "entity.hpp"
 #include "component_storage.hpp"
-#include "signature_storage.hpp"
 
 #include "../mpl/mpl.hpp"
 
@@ -22,9 +21,8 @@ class ec_engine{
 
     using component_signature_storage_t = typename ec_traits_type::component_signature_storage_t;
 
-    using entity_t = entity<ec_traits_type>;
-    using component_storage_t = component_storage<ec_traits_type>;
-    using signature_storage_t = signature_storage<ec_traits_type>;
+    using entity_t              = entity<ec_traits_type>;
+    using component_storage_t   = component_storage<ec_traits_type>;
 
 public:
 
@@ -47,6 +45,14 @@ public:
 
     const entity_t& get_entity(std::uint32_t index) const noexcept{
         return entities_[index];
+    }
+
+    template<typename Tag>
+    inline void add_tag(std::uint32_t entity_id) noexcept{
+        if(entity_id < entity_count_) [[likely]] {
+            entity_t& e = entities_[entity_id];
+            e.set_tag<Tag>();
+        }
     }
 
     /**
@@ -119,6 +125,34 @@ public:
         }
     }
 
+    /**
+     * @brief Recurse entities
+     * 
+     * @tparam Tag 
+     * @tparam Callable 
+     * @tparam Components The interested components in entity if tag matches
+     * @param c 
+     */
+    template<typename Tag, class Callable, typename... Components>
+    void each_matching_tag(Callable c){
+        static_assert(ECT::template is_tag<Tag>(), "tparam Tag is not a tag");
+        constexpr auto tag_index = static_cast<int>(ECT::template tag_index<Tag>());
+        auto sig_ = build_signature<Components...>();
+
+        for (const entity_t& entity_ : entities_){
+            if(entity_.tag() == tag_index && entity_.check(sig_)){
+                c( components_.get_component<Components>(entity_.get_data_index<Components>())... );
+            }
+        }
+    }
+
+    /**
+     * @brief 
+     * 
+     * @tparam Ts The components
+     * @tparam callable 
+     * @param c 
+     */
     template<typename... Ts, class callable>
     void for_matching_entities(callable c){
         auto sig_ = build_signature<Ts...>();
@@ -129,10 +163,17 @@ public:
         }
     } 
 
+    /**
+     * @brief Builds a signature bitset
+     * 
+     * @tparam Ts The components
+     * @return component_signature_storage_t 
+     */
     template<typename... Ts>
     static component_signature_storage_t build_signature(){
         component_signature_storage_t sig_{false};
         (set_signature<Ts>(sig_) , ... );
+
         return sig_;
     }
 
@@ -147,7 +188,6 @@ private:
 private:
     std::vector<entity_t> entities_{};
     component_storage_t components_{};
-    signature_storage_t signatures_{};
 
     std::uint32_t entity_count_{0};
 };

@@ -15,16 +15,19 @@ TEST(Entitytests, entity)
   struct C2{}; // 1
   struct C3{}; // 2
 
-  // Signatures
-  struct S1{}; // 0
-  struct S2{}; // 1
+  // Tags
+  struct tag1{}; // 0
+  struct tag2{}; // 1
+  struct tag3{}; // 2
+  struct tag4{}; // 3
+  struct tag5{}; // 4
 
   struct nothing_at_all{};
 
   using components = yaecs::component_list<C1, C2, C3>;
-  using signatures = yaecs::signature_list<S1, S2>;
+  using tags = yaecs::tag_list<tag1, tag2, tag3, tag4, tag5>;
 
-  using ec_traits_t = yaecs::ec_traits<components, signatures>;
+  using ec_traits_t = yaecs::ec_traits<components, tags>;
 
   using entity_t = yaecs::entity<ec_traits_t>;
 
@@ -37,6 +40,10 @@ TEST(Entitytests, entity)
   EXPECT_EQ(e1.get_signature<C1>(), true);
   EXPECT_EQ(e1.get_signature<C2>(), false);
   EXPECT_EQ(e1.get_signature<C3>(), true);
+
+  e1.set_tag<tag4>();
+
+  EXPECT_EQ(e1.tag(), 3);
 
 }
 
@@ -54,9 +61,9 @@ TEST(Entity_component_traits_tests, ec_trait)
   struct nothing_at_all{};
 
   using components = yaecs::component_list<C1, C2, C3>;
-  using signatures = yaecs::signature_list<S1, S2>;
+  using tags = yaecs::tag_list<S1, S2>;
 
-  using ec_traits_t = yaecs::ec_traits<components, signatures>;
+  using ec_traits_t = yaecs::ec_traits<components, tags>;
 
   ec_traits_t ec_traits_1{};
 
@@ -67,52 +74,30 @@ TEST(Entity_component_traits_tests, ec_trait)
   EXPECT_EQ(ec_traits_1.is_component<S1>(), false);
   EXPECT_EQ(ec_traits_1.is_component<S2>(), false);
 
-  EXPECT_EQ(ec_traits_1.is_signature<C1>(), false);
-  EXPECT_EQ(ec_traits_1.is_signature<C2>(), false);
-  EXPECT_EQ(ec_traits_1.is_signature<C3>(), false);
+  EXPECT_EQ(ec_traits_1.is_tag<C1>(), false);
+  EXPECT_EQ(ec_traits_1.is_tag<C2>(), false);
+  EXPECT_EQ(ec_traits_1.is_tag<C3>(), false);
 
-  EXPECT_EQ(ec_traits_1.is_signature<S1>(), true);
-  EXPECT_EQ(ec_traits_1.is_signature<S2>(), true);
+  EXPECT_EQ(ec_traits_1.is_tag<S1>(), true);
+  EXPECT_EQ(ec_traits_1.is_tag<S2>(), true);
 
   EXPECT_EQ(ec_traits_1.component_count_, 3);
-  EXPECT_EQ(ec_traits_1.signature_count_, 2);
+  EXPECT_EQ(ec_traits_1.tag_count_, 2);
 
   EXPECT_EQ(ec_traits_1.component_index<C1>(), 0);
   EXPECT_EQ(ec_traits_1.component_index<C2>(), 1);
   EXPECT_EQ(ec_traits_1.component_index<C3>(), 2);
   EXPECT_EQ(ec_traits_1.component_index<nothing_at_all>(), -1);
 
-  EXPECT_EQ(ec_traits_1.signature_index<S1>(), 0);
-  EXPECT_EQ(ec_traits_1.signature_index<S2>(), 1);
-  EXPECT_EQ(ec_traits_1.signature_index<nothing_at_all>(), -1);
+  EXPECT_EQ(ec_traits_1.tag_index<S1>(), 0);
+  EXPECT_EQ(ec_traits_1.tag_index<S2>(), 1);
+  EXPECT_EQ(ec_traits_1.tag_index<nothing_at_all>(), -1);
 
   using component_signature_storage_type = typename ec_traits_t::component_signature_storage_t;
 
   // we have 3 components
   auto csst = std::is_same_v<component_signature_storage_type, std::bitset<3>>;
   EXPECT_EQ(csst, true);
-
-}
-
-TEST(Tag_storage_tests, tag_storage)
-{
-  // Components
-  struct C1{};
-  struct C2{};
-  struct C3{};
-
-  // Signatures
-  struct S1{};
-  struct S2{};
-
-  struct nothing_at_all{};
-
-  using components = yaecs::component_list<C1, C2, C3>;
-  using signatures = yaecs::signature_list<S1, S2>;
-
-  using ec_traits_t = yaecs::ec_traits<components, signatures>;
-
-  // using signature_storage_t = yaecs::signature_storage<ec_traits_t>;
 
 }
 
@@ -139,9 +124,9 @@ TEST(Component_storage_tests, component_storage)
   struct nothing_at_all{};
 
   using components = yaecs::component_list<C1, C2, C3>;
-  using signatures = yaecs::signature_list<S1, S2>;
+  using tags = yaecs::tag_list<S1, S2>;
 
-  using ec_traits_t = yaecs::ec_traits<components, signatures>;
+  using ec_traits_t = yaecs::ec_traits<components, tags>;
 
   using component_storage_t = yaecs::component_storage<ec_traits_t>;
 
@@ -233,9 +218,9 @@ TEST(ec_engine_entity_tests, ec_engine_entity)
   struct nothing_at_all{};
 
   using components = yaecs::component_list<C1, C2, C3>;
-  using signatures = yaecs::signature_list<S1, S2>;
+  using tags = yaecs::tag_list<S1, S2>;
 
-  using ec_traits_t = yaecs::ec_traits<components, signatures>;
+  using ec_traits_t = yaecs::ec_traits<components, tags>;
 
   using ec_engine_type_t = yaecs::ec_engine<ec_traits_t>;
 
@@ -278,16 +263,16 @@ TEST(ec_engine_system_tests, ec_engine_system)
     std::uint32_t program_id;
   };
 
-  // Signatures
-  struct S1{};
-  struct S2{};
+  // Tags
+  struct particle_tag{};
+  struct follow_camera_tag{};
 
   struct nothing_at_all{};
 
   using components = yaecs::component_list<position, color, shader>;
-  using signatures = yaecs::signature_list<S1, S2>;
+  using tags = yaecs::tag_list<particle_tag, follow_camera_tag>;
 
-  using ec_traits_t = yaecs::ec_traits<components, signatures>;
+  using ec_traits_t = yaecs::ec_traits<components, tags>;
   using component_signature_storage_t = typename ec_traits_t::component_signature_storage_t;
 
   using ec_engine_type_t = yaecs::ec_engine<ec_traits_t>;
@@ -308,6 +293,8 @@ TEST(ec_engine_system_tests, ec_engine_system)
   engine_.add_component<shader>(something_2, shader{1});
 
   engine_.add_component<position>(something_3, pos_1);
+
+  engine_.add_tag<particle_tag>(something_2);
 
   //--------------------------------------------------
 
@@ -346,5 +333,19 @@ TEST(ec_engine_system_tests, ec_engine_system)
     EXPECT_EQ(pos.x, 1.0f);
     EXPECT_EQ(s.program_id, static_cast<std::uint32_t>(12121));
   });
+
+  auto particle_handle = [&](position& pos, shader& s){
+    pos.y = 12.0f;
+    s.program_id = 32;
+  };
+
+  engine_.each_matching_tag<particle_tag, decltype(particle_handle), position, shader>(particle_handle);
+
+  auto particle_handle2 = [&](position& pos, shader& s){
+    EXPECT_EQ(pos.y, 12.0f);
+    EXPECT_EQ(s.program_id, static_cast<std::uint32_t>(32));
+  };
+
+  engine_.each_matching_tag<particle_tag, decltype(particle_handle2), position, shader>(particle_handle2);
 
 }

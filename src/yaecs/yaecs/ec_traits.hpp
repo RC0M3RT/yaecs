@@ -7,10 +7,7 @@
 namespace yaecs{
 
 template<typename... Ts>
-using signature =  yaecs::mpl::type_list<Ts...>;
-
-template<typename... Ts>
-using signature_list = yaecs::mpl::type_list<Ts...>;
+using tag_list = yaecs::mpl::type_list<Ts...>;
 
 template<typename... Ts>
 using component_list = yaecs::mpl::type_list<Ts...>;
@@ -19,15 +16,16 @@ using component_list = yaecs::mpl::type_list<Ts...>;
  * @brief Entity component traits
  * 
  * @tparam CL component list
- * @tparam SL signature list
+ * @tparam TL tag list
  */
-template<typename CL, typename SL>
+template<typename CL, typename TL>
 struct ec_traits
 {
-    using component_list                        = CL;
-    using signature_list                        = SL;
+    using component_list                  = CL;
+    using tag_list                        = TL;
 
     using component_signature_storage_t         = std::bitset< yaecs::mpl::size_v<component_list> >;
+    using tag_storage_per_entity_t              = std::bitset< yaecs::mpl::size_v<tag_list> >;
 
     template<typename T>
     static constexpr bool is_component(){
@@ -35,8 +33,8 @@ struct ec_traits
     }
 
     template<typename T>
-    static constexpr bool is_signature(){
-        return yaecs::mpl::contains_v<T, signature_list>;
+    static constexpr bool is_tag(){
+        return yaecs::mpl::contains_v<T, tag_list>;
     }
 
     template<typename T>
@@ -50,17 +48,17 @@ struct ec_traits
     }
 
     template<typename T>
-    static constexpr int signature_index(){
-        if constexpr(yaecs::mpl::contains_v<T, signature_list>){
-            return yaecs::mpl::index_v<T, signature_list>;
+    static constexpr int tag_index(){
+        if constexpr(yaecs::mpl::contains_v<T, tag_list>){
+            return yaecs::mpl::index_v<T, tag_list>;
         }
         else{
             return -1;
         }
     }
 
-    static constexpr int signature_count(){
-        return signature_count_;
+    static constexpr int tag_count(){
+        return tag_count_;
     }
 
     static constexpr int component_count(){
@@ -68,7 +66,7 @@ struct ec_traits
     }
 
     constexpr static int component_count_{yaecs::mpl::size_v<component_list>};
-    constexpr static int signature_count_{yaecs::mpl::size_v<signature_list>};
+    constexpr static int tag_count_{yaecs::mpl::size_v<tag_list>};
 };
 
 

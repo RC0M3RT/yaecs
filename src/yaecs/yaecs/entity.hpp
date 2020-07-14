@@ -50,7 +50,7 @@ public:
         }
     }
 
-    bool check(component_signature_storage other_signature){
+    bool check(component_signature_storage other_signature) const noexcept{
         return (signatures_ & other_signature) == other_signature;
     }
 
@@ -70,10 +70,23 @@ public:
         return data_index_per_component_[component_index];
     }
 
+    [[nodiscard]] const int tag() const noexcept{
+        return tag_;
+    }
+
+    template<typename T>
+    void set_tag() noexcept{
+        static_assert(ECT::template is_tag<T>(), "T is not a tag");
+        constexpr auto tag_index = static_cast<int>(ECT::template tag_index<T>());
+
+        tag_ = tag_index;
+    }
+
 private:
     std::uint32_t id_;
     component_signature_storage signatures_{false};
     std::array<std::uint32_t, ECT::component_count()> data_index_per_component_{};
+    int tag_{-1};
 };
 
 } // namespace yaecs
