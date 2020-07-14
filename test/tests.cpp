@@ -1,15 +1,14 @@
-#include <catch2/catch_all.hpp>
+#include "gtest/gtest.h"
 
 #include <yaecs/yaecs.hpp>
 #include <yaecs/mpl/mpl.hpp>
-
 
 #include <type_traits>
 #include <vector>
 #include <string>
 #include <iostream>
 
-TEST_CASE("Entity tests", "[entity]")
+TEST(Entitytests, entity)
 {
   // Components
   struct C1{}; // 0
@@ -35,13 +34,13 @@ TEST_CASE("Entity tests", "[entity]")
   e1.set_signature<C2>(false);
   e1.set_signature<C3>(true);
 
-  REQUIRE(e1.get_signature<C1>() == true);
-  REQUIRE(e1.get_signature<C2>() == false);
-  REQUIRE(e1.get_signature<C3>() == true);
+  EXPECT_EQ(e1.get_signature<C1>(), true);
+  EXPECT_EQ(e1.get_signature<C2>(), false);
+  EXPECT_EQ(e1.get_signature<C3>(), true);
 
 }
 
-TEST_CASE("Entity component traits tests", "[ec_trait]")
+TEST(Entity_component_traits_tests, ec_trait)
 {
   // Components
   struct C1{};
@@ -61,40 +60,41 @@ TEST_CASE("Entity component traits tests", "[ec_trait]")
 
   ec_traits_t ec_traits_1{};
 
-  REQUIRE(ec_traits_1.is_component<C1>() == true);
-  REQUIRE(ec_traits_1.is_component<C2>() == true);
-  REQUIRE(ec_traits_1.is_component<C3>() == true);
+  EXPECT_EQ(ec_traits_1.is_component<C1>(), true);
+  EXPECT_EQ(ec_traits_1.is_component<C2>(), true);
+  EXPECT_EQ(ec_traits_1.is_component<C3>(), true);
 
-  REQUIRE(ec_traits_1.is_component<S1>() == false);
-  REQUIRE(ec_traits_1.is_component<S2>() == false);
+  EXPECT_EQ(ec_traits_1.is_component<S1>(), false);
+  EXPECT_EQ(ec_traits_1.is_component<S2>(), false);
 
-  REQUIRE(ec_traits_1.is_signature<C1>() == false);
-  REQUIRE(ec_traits_1.is_signature<C2>() == false);
-  REQUIRE(ec_traits_1.is_signature<C3>() == false);
+  EXPECT_EQ(ec_traits_1.is_signature<C1>(), false);
+  EXPECT_EQ(ec_traits_1.is_signature<C2>(), false);
+  EXPECT_EQ(ec_traits_1.is_signature<C3>(), false);
 
-  REQUIRE(ec_traits_1.is_signature<S1>() == true);
-  REQUIRE(ec_traits_1.is_signature<S2>() == true);
+  EXPECT_EQ(ec_traits_1.is_signature<S1>(), true);
+  EXPECT_EQ(ec_traits_1.is_signature<S2>(), true);
 
-  REQUIRE(ec_traits_1.component_count_ == 3);
-  REQUIRE(ec_traits_1.signature_count_ == 2);
+  EXPECT_EQ(ec_traits_1.component_count_, 3);
+  EXPECT_EQ(ec_traits_1.signature_count_, 2);
 
-  REQUIRE(ec_traits_1.component_index<C1>() == 0);
-  REQUIRE(ec_traits_1.component_index<C2>() == 1);
-  REQUIRE(ec_traits_1.component_index<C3>() == 2);
-  REQUIRE(ec_traits_1.component_index<nothing_at_all>() == -1);
+  EXPECT_EQ(ec_traits_1.component_index<C1>(), 0);
+  EXPECT_EQ(ec_traits_1.component_index<C2>(), 1);
+  EXPECT_EQ(ec_traits_1.component_index<C3>(), 2);
+  EXPECT_EQ(ec_traits_1.component_index<nothing_at_all>(), -1);
 
-  REQUIRE(ec_traits_1.signature_index<S1>() == 0);
-  REQUIRE(ec_traits_1.signature_index<S2>() == 1);
-  REQUIRE(ec_traits_1.signature_index<nothing_at_all>() == -1);
+  EXPECT_EQ(ec_traits_1.signature_index<S1>(), 0);
+  EXPECT_EQ(ec_traits_1.signature_index<S2>(), 1);
+  EXPECT_EQ(ec_traits_1.signature_index<nothing_at_all>(), -1);
 
   using component_signature_storage_type = typename ec_traits_t::component_signature_storage_t;
 
   // we have 3 components
-  REQUIRE(std::is_same_v<component_signature_storage_type, std::bitset<3>> == true);
+  auto csst = std::is_same_v<component_signature_storage_type, std::bitset<3>>;
+  EXPECT_EQ(csst, true);
 
 }
 
-TEST_CASE("Signature storage tests", "[signature_storage]")
+TEST(Tag_storage_tests, tag_storage)
 {
   // Components
   struct C1{};
@@ -112,16 +112,11 @@ TEST_CASE("Signature storage tests", "[signature_storage]")
 
   using ec_traits_t = yaecs::ec_traits<components, signatures>;
 
-  using signature_storage_t = yaecs::signature_storage<ec_traits_t>;
+  // using signature_storage_t = yaecs::signature_storage<ec_traits_t>;
 
-  signature_storage_t ss_{};
-
-  auto sb_ = ss_.get_signature_bitset<S1>();
-
-  sb_.set();
 }
 
-TEST_CASE("Component storage tests", "[component_storage]")
+TEST(Component_storage_tests, component_storage)
 {
   // Components
   struct C1{
@@ -157,16 +152,16 @@ TEST_CASE("Component storage tests", "[component_storage]")
   cs_.add_component<C1>(c1_);
   auto c1p_ = cs_.get_component<C1>(0);
 
-  REQUIRE(c1p_.i1 == 211);
-  REQUIRE(c1p_.s1 == "asdasd");
+  EXPECT_EQ(c1p_.i1, 211);
+  EXPECT_EQ(c1p_.s1, "asdasd");
 
   C2 c2_{3.10f, "qqwewe"};
 
   cs_.add_component<C2>(c2_);
   auto c2p_ = cs_.get_component<C2>(0);
 
-  REQUIRE(c2p_.f2 == 3.10f);
-  REQUIRE(c2p_.s2 == "qqwewe");
+  EXPECT_EQ(c2p_.f2, 3.10f);
+  EXPECT_EQ(c2p_.s2, "qqwewe");
 
   C3 c3_1{"111", "222"};
   C3 c3_2{"3333", "4444"};
@@ -180,18 +175,18 @@ TEST_CASE("Component storage tests", "[component_storage]")
   auto c3_2_data_ = cs_.get_component<C3>(c3_2_data_index);
   auto c3_3_data_ = cs_.get_component<C3>(c3_3_data_index);
 
-  REQUIRE(c3_1_data_.s3_1 == "111");
-  REQUIRE(c3_1_data_.s3_2 == "222");
+  EXPECT_EQ(c3_1_data_.s3_1, "111");
+  EXPECT_EQ(c3_1_data_.s3_2, "222");
 
-  REQUIRE(c3_2_data_.s3_1 == "3333");
-  REQUIRE(c3_2_data_.s3_2 == "4444");
+  EXPECT_EQ(c3_2_data_.s3_1, "3333");
+  EXPECT_EQ(c3_2_data_.s3_2, "4444");
 
-  REQUIRE(c3_3_data_.s3_1 == "55555");
-  REQUIRE(c3_3_data_.s3_2 == "66666");
+  EXPECT_EQ(c3_3_data_.s3_1, "55555");
+  EXPECT_EQ(c3_3_data_.s3_2, "66666");
 
 }
 
-TEST_CASE("mpl tests", "[mpl]")
+TEST(mpl_tests, mpl_tt)
 {
   struct T1{};
   struct T2{};
@@ -201,22 +196,30 @@ TEST_CASE("mpl tests", "[mpl]")
 
   using tl = yaecs::mpl::type_list<T1, T2, T3>;
 
-  REQUIRE(yaecs::mpl::size_v<tl> == 3);
+  auto s1 = yaecs::mpl::size_v<tl>;
+  EXPECT_EQ(s1, static_cast<std::size_t>(3));
 
-  REQUIRE(yaecs::mpl::index_v<T1, tl> == 0);
-  REQUIRE(yaecs::mpl::index_v<T2, tl> == 1);
-  REQUIRE(yaecs::mpl::index_v<T3, tl> == 2);
+  auto i1 = yaecs::mpl::index_v<T1, tl>;
+  EXPECT_EQ(i1, static_cast<std::size_t>(0));
+  auto i2 = yaecs::mpl::index_v<T2, tl>;
+  EXPECT_EQ(i2, static_cast<std::size_t>(1));
+  auto i3 = yaecs::mpl::index_v<T3, tl>;
+  EXPECT_EQ(i3, static_cast<std::size_t>(2));
 
-  REQUIRE(yaecs::mpl::contains_v<T1, tl> == true);
-  REQUIRE(yaecs::mpl::contains_v<T2, tl> == true);
-  REQUIRE(yaecs::mpl::contains_v<T3, tl> == true);
+  auto c1 = yaecs::mpl::contains_v<T1, tl>;
+  EXPECT_EQ(c1, true);
+  auto c2 = yaecs::mpl::contains_v<T2, tl>;
+  EXPECT_EQ(c2, true);
+  auto c3 = yaecs::mpl::contains_v<T3, tl>;
+  EXPECT_EQ(c3, true);
 
-  REQUIRE(yaecs::mpl::contains_v<nothing_at_all, tl> == false);
+  auto c4 = yaecs::mpl::contains_v<nothing_at_all, tl>;
+  EXPECT_EQ(c4, false);
 
 }
 
 
-TEST_CASE("ec_engine entity tests", "[ec_engine.entity]")
+TEST(ec_engine_entity_tests, ec_engine_entity)
 {
   // Components
   struct C1{};
@@ -240,9 +243,9 @@ TEST_CASE("ec_engine entity tests", "[ec_engine.entity]")
 
   auto e1_id = engine_.create_entity();
 
-  REQUIRE(e1_id == engine_.get_entity(0).id());
+  EXPECT_EQ(e1_id, engine_.get_entity(0).id());
 
-  REQUIRE(engine_.entity_count() == 1);
+  EXPECT_EQ(engine_.entity_count(), static_cast<std::uint32_t>(1));
 
   engine_.create_entity();
   engine_.create_entity();
@@ -253,10 +256,10 @@ TEST_CASE("ec_engine entity tests", "[ec_engine.entity]")
   engine_.create_entity();
   engine_.create_entity();
   
-  REQUIRE(engine_.entity_count() == 9);
+  EXPECT_EQ(engine_.entity_count(), static_cast<std::uint32_t>(9));
 }
 
-TEST_CASE("ec_engine system tests", "[ec_engine.system]")
+TEST(ec_engine_system_tests, ec_engine_system)
 {
   struct position{
     float x;
@@ -315,12 +318,12 @@ TEST_CASE("ec_engine system tests", "[ec_engine.system]")
 
   std::bitset<ec_traits_t::component_count()> some_system_signature_ = engine_.build_signature<position, color>();
 
-  REQUIRE(some_system_signature_[0] == true);
+  EXPECT_EQ(some_system_signature_[0], true);
 
   std::bitset<ec_traits_t::component_count()> some_system_signature2_ = engine_.build_signature<color>();
 
-  REQUIRE(some_system_signature2_[0] == false);
-  REQUIRE(some_system_signature2_[1] == true);
+  EXPECT_EQ(some_system_signature2_[0], false);
+  EXPECT_EQ(some_system_signature2_[1], true);
 
   //---------------------------------------------
 
@@ -330,8 +333,8 @@ TEST_CASE("ec_engine system tests", "[ec_engine.system]")
   });
 
   engine_.for_matching_entities<position, color>([&](auto& pos, auto& col){
-    REQUIRE(pos.x == 1.0f);
-    REQUIRE(col.r == 6.0f);
+    EXPECT_EQ(pos.x, 1.0f);
+    EXPECT_EQ(col.r, 6.0f);
   });
 
   engine_.for_matching_entities<position, shader>([&](auto& pos, auto& s){
@@ -340,8 +343,8 @@ TEST_CASE("ec_engine system tests", "[ec_engine.system]")
   });
 
   engine_.for_matching_entities<position, shader>([&](auto& pos, auto& s){
-    REQUIRE(pos.x == 1.0f);
-    REQUIRE(s.program_id == 12121);
+    EXPECT_EQ(pos.x, 1.0f);
+    EXPECT_EQ(s.program_id, static_cast<std::uint32_t>(12121));
   });
 
 }

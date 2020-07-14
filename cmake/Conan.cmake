@@ -16,11 +16,13 @@ macro(run_conan)
   conan_cmake_run(
     REQUIRES
     ${CONAN_EXTRA_REQUIRES}
-    catch2/3.0.0@catchorg/stable
+    gtest/1.10.0
+    benchmark/1.5.0
     OPTIONS
     ${CONAN_EXTRA_OPTIONS}
     BASIC_SETUP
     CMAKE_TARGETS # individual targets to link to
+    SETTINGS benchmark:build_type=Release
     BUILD
     missing)
 endmacro()
